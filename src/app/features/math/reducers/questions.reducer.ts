@@ -7,13 +7,15 @@ export interface QuestionEntity {
   question: string;
   answer: number;
 }
-
+interface MissedQuestion { id: number; providedAnswer: number; }
 export interface MathQuestionsState extends EntityState<QuestionEntity> {
   currentQuestionId: number;
+  missedQuestions: MissedQuestion[];
 }
 
 const initialState: MathQuestionsState = {
   currentQuestionId: 1,
+  missedQuestions: [],
   ids: [1, 2, 3, 4, 5],
   entities: {
     1: {
@@ -48,7 +50,18 @@ export const adapter = createEntityAdapter<QuestionEntity>();
 
 export const reducer = createReducer(
   initialState,
-  on(questionActions.answerProvided, (state, action) => ({ ...state, currentQuestionId: state.currentQuestionId + 1 }))
+  on(questionActions.answerProvided, (state, action) => {
+    let tempState = { ...state };
+
+    const currentQuestion = state.entities[state.currentQuestionId];
+
+    if (action.guess !== currentQuestion.answer) {
+      // add the questionId and their guess to the array of missedQuestions
+      tempState = { ...tempState, missedQuestions: [...state.missedQuestions, { id: currentQuestion.id, providedAnswer: action.guess }] };
+    }
+    const newState = ({ ...tempState, currentQuestionId: state.currentQuestionId + 1 });
+    return newState;
+  })
 );
 
 // TODO: This will blow up way later. REmember this. I'll fix it then.
