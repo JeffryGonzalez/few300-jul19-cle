@@ -1,7 +1,8 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import * as questionActions from '../actions/questions.actions';
-
+import { tassign } from 'tassign';
+import { MathState } from '.';
 export interface QuestionEntity {
   id: number;
   question: string;
@@ -12,6 +13,7 @@ export interface MathQuestionsState extends EntityState<QuestionEntity> {
   currentQuestionId: number;
   missedQuestions: MissedQuestion[];
 }
+
 
 const initialState: MathQuestionsState = {
   currentQuestionId: 1,
@@ -48,7 +50,7 @@ const initialState: MathQuestionsState = {
 
 export const adapter = createEntityAdapter<QuestionEntity>();
 
-export const reducer = createReducer(
+const mathReducer = createReducer(
   initialState,
   on(questionActions.playAgain, () => initialState),
   on(questionActions.answerProvided, (state, action) => {
@@ -60,9 +62,13 @@ export const reducer = createReducer(
       // add the questionId and their guess to the array of missedQuestions
       tempState = { ...tempState, missedQuestions: [...state.missedQuestions, { id: currentQuestion.id, providedAnswer: action.guess }] };
     }
-    const newState = ({ ...tempState, currentQuestionId: state.currentQuestionId + 1 });
+    // const newState = ({ ...tempState, currentQuestionId: state.currentQuestionId + 1 });
+    const newState = tassign(tempState, { currentQuestionId: state.currentQuestionId + 1 });
     return newState;
   })
 );
 
+export function reducer(state: MathQuestionsState | undefined, action: Action) {
+  return mathReducer(state, action);
+}
 // TODO: This will blow up way later. REmember this. I'll fix it then.

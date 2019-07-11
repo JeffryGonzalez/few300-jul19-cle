@@ -7,7 +7,7 @@
          (click)="playAgain()">
 </div>
 <div class="card"
-     *ngIf="!(gameOver$ | async)">
+     *ngIf="(gameOver$ | async) === (false || null || undefined)">
   <div class="card-body">
     <h5 class="card-title">Question {{ (model$ | async)?.num }}
       of {{ (model$ | async)?.of }}</h5>
@@ -22,7 +22,7 @@
              id="answer">
     </div>
     <input type="button"
-           *ngIf="!(atEnd$ | async)"
+           *ngIf="(atEnd$ | async) === (false || null || undefined)"
            (click)="next(guess)"
            class="btn btn-primary"
            value="Next Question">
