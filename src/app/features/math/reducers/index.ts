@@ -3,7 +3,7 @@ export const featureName = 'mathFeature';
 import * as fromQuestions from './questions.reducer';
 
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { QuestionModel } from '../models';
+import { QuestionModel, ScoresModel } from '../models';
 
 export interface MathState {
   questions: fromQuestions.MathQuestionsState;
@@ -26,6 +26,7 @@ const selectCurrentQuestionId = createSelector(selectQuestionsBranch, q => q.cur
 // Object Destructuring - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 const {
   selectTotal: selectTotalNumberOfQuestions,
+  selectAll: selectAllQuestions,
   selectEntities: selectQuestionEntities } = fromQuestions.adapter.getSelectors(selectQuestionsBranch);
 
 const selectSelectedQuestion = createSelector(
@@ -62,3 +63,57 @@ export const selectGameOverMan = createSelector(
   selectQuestionsBranch,
   q => q.missedQuestions.length === 3
 );
+
+// create a selector that returns the ScoresModel
+const selectScores = createSelector(
+  selectQuestionsBranch,
+  b => b.missedQuestions
+);
+const selectNumberCorrect = createSelector(
+  selectTotalNumberOfQuestions,
+  selectScores,
+  (total, wrong) => total - wrong.length
+);
+export const selectScoresModel = createSelector(
+  selectTotalNumberOfQuestions,
+  selectNumberCorrect,
+  selectScores,
+  selectAllQuestions,
+  (numberOfQuestions, numberCorrect, scores, questions) => {
+    const result: ScoresModel = {
+      numberOfQuestions,
+      numberCorrect,
+      numberWrong: numberOfQuestions - numberCorrect,
+      scores: questions.map(q => {
+        const incorrect = scores.some(s => s.id === q.id);
+        const providedAnswer = incorrect ? scores.filter(s => s.id === q.id)[0].providedAnswer : null;
+        const questionResponse = {
+          num: q.id,
+          question: q.question,
+          answer: q.answer,
+          incorrect,
+          providedAnswer
+        };
+        return questionResponse;
+
+      })
+    };
+    return result;
+  }
+);
+
+/*
+export interface ScoresModel {
+  scores: ScoreLineModel[];
+  numberOfQuestions: number;
+  numberCorrect: number;
+  numberWrong: number;
+}
+interface ScoreLineModel {
+  num: number;
+  question: string;
+  answer: number;
+  incorrect: boolean;
+  providedAnswer: number;
+}
+*/
