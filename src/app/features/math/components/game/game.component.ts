@@ -15,10 +15,13 @@ export class GameComponent implements OnInit {
 
   model$: Observable<QuestionModel>;
   atEnd$: Observable<boolean>;
+  missedQuestions$: Observable<number>;
   gameOver$: Observable<boolean>;
   constructor(private store: Store<MathState>, private router: Router) { }
 
+
   ngOnInit() {
+    // this.missedQuestions$ = this.store.select(s => s.questions.missedQuestions.length);
     this.model$ = this.store.select(selectQuestionModel);
     this.atEnd$ = this.store.select(selectAtEndOfQuestions);
     this.gameOver$ = this.store.select(selectGameOverMan);

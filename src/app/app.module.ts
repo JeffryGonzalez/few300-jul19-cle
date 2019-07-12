@@ -10,7 +10,8 @@ import { MathModule } from './features/math/math.module';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { reducers } from './reducers';
-
+import { EffectsModule } from '@ngrx/effects';
+import { HttpClientModule } from '@angular/common/http';
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +24,9 @@ import { reducers } from './reducers';
     MathModule,
     AppRoutingModule, // after any feature modules.,
     StoreModule.forRoot(reducers),
-    StoreDevtoolsModule.instrument()
+    StoreDevtoolsModule.instrument(),
+    EffectsModule.forRoot([]),
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

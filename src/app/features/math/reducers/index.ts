@@ -1,16 +1,19 @@
 
 export const featureName = 'mathFeature';
 import * as fromQuestions from './questions.reducer';
+import * as fromSavedScores from './saved-scores.reducer';
 
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { QuestionModel, ScoresModel } from '../models';
 
 export interface MathState {
   questions: fromQuestions.MathQuestionsState;
+  savedScores: fromSavedScores.SavedScoresState;
 }
 
 export const reducers = {
-  questions: fromQuestions.reducer
+  questions: fromQuestions.reducer,
+  savedScores: fromSavedScores.savedScoresReducer
 };
 
 
@@ -20,7 +23,7 @@ const selectMathFeature = createFeatureSelector<MathState>(featureName);
 // 2. Create a selector for each "branch" of the MathState (e.g., questions)
 
 const selectQuestionsBranch = createSelector(selectMathFeature, m => m.questions);
-
+const selectSavedScoresBranch = createSelector(selectMathFeature, m => m.savedScores);
 // 3. Selectors that are "helpers" to get the data you need for step 4.
 const selectCurrentQuestionId = createSelector(selectQuestionsBranch, q => q.currentQuestionId);
 // Object Destructuring - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
@@ -29,6 +32,7 @@ const {
   selectAll: selectAllQuestions,
   selectEntities: selectQuestionEntities } = fromQuestions.adapter.getSelectors(selectQuestionsBranch);
 
+const { selectAll: selectAllSavedScores } = fromSavedScores.adapter.getSelectors(selectSavedScoresBranch);
 const selectSelectedQuestion = createSelector(
   selectQuestionEntities,
   selectCurrentQuestionId,
@@ -36,6 +40,7 @@ const selectSelectedQuestion = createSelector(
 );
 // 4. Create a selector for each component model
 
+export const selectSavedScoresModel = createSelector(selectAllSavedScores, s => s);
 // TODO Create a selector that returns a QuestionModel
 // current id, how many total, question for the current question
 
@@ -102,18 +107,13 @@ export const selectScoresModel = createSelector(
   }
 );
 
-/*
-export interface ScoresModel {
-  scores: ScoreLineModel[];
-  numberOfQuestions: number;
-  numberCorrect: number;
-  numberWrong: number;
-}
-interface ScoreLineModel {
-  num: number;
-  question: string;
-  answer: number;
-  incorrect: boolean;
-  providedAnswer: number;
-}
-*/
+export const selectHideScores = createSelector(
+  selectTotalNumberOfQuestions,
+  selectCurrentQuestionId,
+  (total, current) => (total + 1) !== current
+);
+
+export const selectHideGame = createSelector(
+  selectHideScores,
+  (x) => !x
+);
