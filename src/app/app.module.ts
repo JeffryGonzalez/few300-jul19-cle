@@ -12,6 +12,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { reducers } from './reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { HttpClientModule } from '@angular/common/http';
+// import { AdminModule } from './features/admin/admin.module';
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule,
     MathModule,
+    // AdminModule,
     AppRoutingModule, // after any feature modules.,
     StoreModule.forRoot(reducers),
     StoreDevtoolsModule.instrument(),
