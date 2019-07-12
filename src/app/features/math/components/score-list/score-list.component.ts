@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ScoresModel } from '../../models';
-
+import { Store } from '@ngrx/store';
+import { MathState } from '../../reducers';
+import * as actions from '../../actions/saved-scores.actions';
 @Component({
   selector: 'app-score-list',
   templateUrl: './score-list.component.html',
@@ -14,9 +16,15 @@ export class ScoreListComponent implements OnInit {
     numberWrong: 0,
     scores: []
   };
-  constructor() { }
+  saved = false;
+  constructor(private store: Store<MathState>) { }
 
   ngOnInit() {
   }
 
+  saveScores() {
+    this.store.dispatch(actions.saveScore(this.scoresModel.numberCorrect,
+      this.scoresModel.numberWrong));
+    this.saved = true;
+  }
 }
